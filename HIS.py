@@ -9,10 +9,10 @@
 import RPi.GPIO as GPIO
 import time
 from time import sleep
-#import sys
+
 import os
 from apscheduler.schedulers.background import BackgroundScheduler
-#import apscheduler.events
+
 import csv
 import paho.mqtt.client as mqtt
 import gvar
@@ -23,8 +23,6 @@ os.chdir(os.path.dirname(__file__))
 ##### Remove if no serial required    
 import serial
 serialArray = [0,1]
-
-targetMoisture = 60
 
 
 # GPIO setup
@@ -81,20 +79,19 @@ def on_message(client, userdata, msg):
         if msg.payload == "true":
             client.publish("HIS/"+plant+"/Pump/getOn", "true")
             log("Turned on water on "+plant+" via MQTT",2)
-            forceWaterPlant(i,gvar.runPumpSec)
+            forceWaterPlant(gvar.runPumpSec)
             client.publish("HIS/"+plant+"/Pump/getOn", "false")
         if msg.payload == "false":
             client.publish("HIS/"+plant+"/Pump/getOn", "false")
-            closeAllValves()
-
+            stopPump()
 
     if msg.topic == "HIS/"+plant+"/WaterTarget/setIncrease":
-        targetMoisture[i] +=1
-        client.publish("HIS/"+plant+"/WaterTarget/Target", targetMoisture[i])
+        gvar.targetMoisture +=1
+        client.publish("HIS/"+plant+"/WaterTarget/Target", gvar.targetMoisture)
         writeNewTargetMoistures()
     if msg.topic == "HIS/"+plant+"/WaterTarget/setDecrease":
-        targetMoisture[i] -= 1
-        client.publish("HIS/"+plant+"/WaterTarget/Target", targetMoisture[i])
+        gvar.targetMoisture -= 1
+        client.publish("HIS/"+plant+"/WaterTarget/Target", gvar.targetMoisture)
         writeNewTargetMoistures()
             
     if msg.topic == "HIS/enableAutomaticWatering/setOn":
@@ -113,13 +110,13 @@ def log(text, level):
         print(gvar.debugStr[level]+text)
         client.publish("HIS/Log", gvar.debugStr[level]+text)       
         
-def convertMtoPerc(sensor, value):
-    return int((value - sensorMin[sensor])*100/(sensorMax[sensor]-sensorMin[sensor]))
 
 def forceWaterPlant(time):
     runPump(time)
 
-
+def stopPump():
+    GPIO.output(pumpPin, GPIO.LOW)
+    log("Stopping Pump",2)
 
 def runPump(time):
     log("Starting Pump",2)
@@ -190,13 +187,12 @@ def checkAndWater():
     log("Temp: "+str(averageTemp),0)
 
     
-            gvar.alarmMoistureLow = True
         
-    if averageMoisture < targetMoisture:
+    if averageMoisture < gvar.targetMoisture:
         log("Watering needed!", 2)
-        if gvar.enableAutomaticWatering    
+        if gvar.enableAutomaticWatering:   
             log("Automatic Watering enabled",2)
-            if !gvar.alarmTankEmpty or gvar.waterEmptyTank:
+            if not gvar.alarmTankEmpty or gvar.waterEmptyTank:
                 log("Tank filled! Watering now!",2)
                 runPump(gvar.runPumpSec)
             else:
@@ -264,7 +260,7 @@ def writeNewTargetMoistures():
     try:
         with open(gvar.pathMoisture, 'w') as csvfile:
             csvwriter = csv.writer(csvfile, delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            csvwriter.writerow(["Moisture"]+targetMoisture)
+            csvwriter.writerow(["Moisture"]+gvar.targetMoisture)
             log("values saved",2)
     except:
         log("Couldn't save values",1)
@@ -280,9 +276,8 @@ def readSettingFiles():
             log("Setting Moisture Target Values",2)
             csvReader = csv.reader(csvDataFile)
             for row in csvReader:
-                for i in range(1,len(row)):
-                    log("Sens "+str(hex(addr[i-1]))+ " Target: "+ str(int(row[i])),3)
-                    targetMoisture[i-1] = int(row[i])
+                    log("SensTarget: "+ str(int(row[1])),3)
+                    gvar.targetMoisture = int(row[1])
     except:
         log("Unable to get Moisture Setting File",1)
         if not os.path.isfile(gvar.pathMoisture):
@@ -341,10 +336,10 @@ if __name__ == "__main__":
                 
 
     except KeyboardInterrupt:  
-        print ("exiting program" )
+        print ("Exiting program" )
 
   
     finally:  
-        closeAllValves()
+        stopPump()
         GPIO.cleanup()
         print ("done")
