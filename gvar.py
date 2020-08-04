@@ -15,7 +15,7 @@ useSerialMoisture = True
 
 waterEmptyTank = True
 
-targetMoisture = 60
+targetMoisture = 68
 
 savetyFromLooseMoistureSensor = False
 
