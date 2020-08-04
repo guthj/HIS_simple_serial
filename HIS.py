@@ -131,7 +131,7 @@ def runPump(time):
 def readMoistureSerial(devNum):
     hasRead = False
     try:
-        with serial.Serial('/dev/ttyACM'+str(devNum), 115200, timeout=2) as ser:
+        with serial.Serial("/dev/ttyACM"+str(devNum), 115200, timeout=2) as ser:
             line = ser.readline()
             hasRead = True
     
