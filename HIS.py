@@ -189,7 +189,7 @@ def checkAndWater():
 
     
         
-    if averageMoisture < gvar.targetMoisture:
+    if averageMoisture*100 < gvar.targetMoisture:
         log("Watering needed!", 2)
         if gvar.enableAutomaticWatering:   
             log("Automatic Watering enabled",2)
