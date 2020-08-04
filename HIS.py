@@ -137,7 +137,8 @@ def readMoistureSerial(devNum):
     
         if hasRead:
             print(line)
-            a = line.split(",")
+            string = str(line, 'utf-8')
+            a = string.split(",")
             return  [float(a[2]),float(a[3])]
         else:
             print("No input")
