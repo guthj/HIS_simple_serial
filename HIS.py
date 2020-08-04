@@ -187,8 +187,9 @@ def checkAndWater():
     log("Moisture: "+str(averageMoisture),0)
     log("Temp: "+str(averageTemp),0)
 
+    client.publish("HIS/Plant/Moisture", int(averageMoisture*100))
+    client.publish("HIS/Plant/Temp", int(averageTemp*100))
     
-        
     if averageMoisture*100 < gvar.targetMoisture:
         log("Watering needed!", 2)
         if gvar.enableAutomaticWatering:   
