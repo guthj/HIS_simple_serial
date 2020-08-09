@@ -7,8 +7,8 @@ Created on Sat May  9 18:20:56 2020
 """
 
 
-distanceEmpty = 5.0
-distanceFull = 50.0
+distanceEmpty = 50.0
+distanceFull = 5.0
 
 ##### Remove if no serial required    
 useSerialMoisture = True

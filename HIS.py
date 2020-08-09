@@ -307,8 +307,7 @@ def readSettingFiles():
 
 
 if __name__ == "__main__":
-    
-        
+    time.sleep(10.0) # wait for everything to connect (Wifi, etc)
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
