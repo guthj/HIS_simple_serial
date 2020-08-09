@@ -45,7 +45,6 @@ GPIO.output(USTriggerPin, False)
 
 
 
-
 #Setup MQTT:
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
@@ -68,7 +67,7 @@ def on_connect(client, userdata, flags, rc):
 def resetHomeBridgeButtons():
     client.publish("HIS/Plant/WaterTarget/getIncrease", "false")
     client.publish("HIS/Plant/WaterTarget/getDecrease", "false")
-
+    client.publish("HIS/Plant/WaterTarget/currentValue", gvar.targetMoisture)
 
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
@@ -87,11 +86,11 @@ def on_message(client, userdata, msg):
 
     if msg.topic == "HIS/"+plant+"/WaterTarget/setIncrease":
         gvar.targetMoisture +=1
-        client.publish("HIS/"+plant+"/WaterTarget/Target", gvar.targetMoisture)
+        client.publish("HIS/"+plant+"/WaterTarget/currentValue", gvar.targetMoisture)
         writeNewTargetMoistures()
     if msg.topic == "HIS/"+plant+"/WaterTarget/setDecrease":
         gvar.targetMoisture -= 1
-        client.publish("HIS/"+plant+"/WaterTarget/Target", gvar.targetMoisture)
+        client.publish("HIS/"+plant+"/WaterTarget/currentValue", gvar.targetMoisture)
         writeNewTargetMoistures()
             
     if msg.topic == "HIS/enableAutomaticWatering/setOn":
@@ -120,10 +119,13 @@ def stopPump():
 
 def runPump(time):
     log("Starting Pump",2)
+    client.publish("HIS/MotionSensor/Watering", "true")
     GPIO.output(pumpPin, GPIO.HIGH)
     sleep(time)
     GPIO.output(pumpPin, GPIO.LOW)
     log("Stopping Pump",2)
+    client.publish("HIS/MotionSensor/Watering", "false")
+
 
 
 ##### Remove if no serial required    
@@ -174,8 +176,7 @@ def checkAndWater():
             if sensorArray[1] >= 0:
                 sensorDataM.append(sensorArray[1])
                 sensorDataT.append(sensorArray[0])
-                print("S"+ str(serialArray[i]) + ": Temperature: " + str(sensorArray[0]) + ", Moisture: " + str(sensorArray[1]*100)+"%")
-                client.publish("SGS/Log", "S"+ str(serialArray[i]) + ": Temperature: " + str(sensorArray[0]) + ", Moisture: " + str(sensorArray[1]*100)+"%")
+                log("HIS/Log", "S"+ str(serialArray[i]) + ": Temperature: " + str(sensorArray[0]) + ", Moisture: " + str(sensorArray[1]*100)+"%", 2)
 
     for i in sensorDataM:
             averageMoisture+=i/len(sensorDataM)
@@ -187,8 +188,8 @@ def checkAndWater():
     log("Moisture: "+str(averageMoisture),0)
     log("Temp: "+str(averageTemp),0)
 
-    client.publish("HIS/Plant/Moisture", int(averageMoisture*100))
-    client.publish("HIS/Plant/Temp", int(averageTemp*100))
+    client.publish("HIS/Plant/currentMoisture", int(averageMoisture*100))
+    client.publish("HIS/Plant/currentTemp", int(averageTemp))
     
     if averageMoisture*100 < gvar.targetMoisture:
         log("Watering needed!", 2)
@@ -302,7 +303,7 @@ def readSettingFiles():
 
                 i += 1                  
     except:
-        log("Unable to read US Settings File. Did you run calib.py?",1)
+        log("Unable to read US Settings File. Did you run calib.py? Starting with default values: 5cm full, 50cm empty",1)
 
 
 if __name__ == "__main__":
