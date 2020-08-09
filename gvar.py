@@ -29,7 +29,7 @@ debugStr = ["None  :  ","Error :  ","Notice:  ","Info  :  ","Debug :  "]
 
 runPumpSec = 20
 
-enableAutomaticWatering = False
+enableAutomaticWatering = True
 
 pathMoisture = '/home/pi/.HIS/settingsMoisture.csv'
 pathUS = '/home/pi/.HIS/settingsUS.csv'
