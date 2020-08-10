@@ -68,29 +68,33 @@ def resetHomeBridgeButtons():
     client.publish("HIS/Plant/WaterTarget/getIncrease", "false")
     client.publish("HIS/Plant/WaterTarget/getDecrease", "false")
     client.publish("HIS/Plant/WaterTarget/currentValue", gvar.targetMoisture)
+    if gvar.enableAutomaticWatering:
+        client.publish("HIS/Plant/WaterTarget/currentValue", "true")
+    else:
+        client.publish("HIS/Plant/WaterTarget/currentValue", "false")
+    
 
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
-    
+    log(msg.topic+" "+str(msg.payload),4)
     #CHECK FOR PLANT SPECIFIC MESSAGES
-    plant = "Plant"
-    if msg.topic == "HIS/"+plant+"/Pump/setOn":
+    if msg.topic == "HIS/Plant/Pump/setOn":
         if msg.payload == "true":
-            client.publish("HIS/"+plant+"/Pump/getOn", "true")
-            log("Turned on water on "+plant+" via MQTT",2)
+            client.publish("HIS/Plant/Pump/getOn", "true")
+            log("Turned on water on Plant via MQTT",2)
             forceWaterPlant(gvar.runPumpSec)
-            client.publish("HIS/"+plant+"/Pump/getOn", "false")
+            client.publish("HIS/Plant/Pump/getOn", "false")
         if msg.payload == "false":
-            client.publish("HIS/"+plant+"/Pump/getOn", "false")
+            client.publish("HIS/Plant/Pump/getOn", "false")
             stopPump()
 
-    if msg.topic == "HIS/"+plant+"/WaterTarget/setIncrease":
+    if msg.topic == "HIS/Plant/WaterTarget/setIncrease":
         gvar.targetMoisture +=1
-        client.publish("HIS/"+plant+"/WaterTarget/currentValue", gvar.targetMoisture)
+        client.publish("HIS/Plant/WaterTarget/currentValue", gvar.targetMoisture)
         writeNewTargetMoistures()
-    if msg.topic == "HIS/"+plant+"/WaterTarget/setDecrease":
+    if msg.topic == "HIS/Plant/WaterTarget/setDecrease":
         gvar.targetMoisture -= 1
-        client.publish("HIS/"+plant+"/WaterTarget/currentValue", gvar.targetMoisture)
+        client.publish("HIS/Plant/WaterTarget/currentValue", gvar.targetMoisture)
         writeNewTargetMoistures()
             
     if msg.topic == "HIS/enableAutomaticWatering/setOn":
