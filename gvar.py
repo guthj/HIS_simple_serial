@@ -31,9 +31,9 @@ runPumpSec = 20
 
 enableAutomaticWatering = True
 
-pathMoisture = '/home/pi/.HIS/settingsMoisture.csv'
-pathUS = '/home/pi/.HIS/settingsUS.csv'
-pathSensor = '/home/pi/.HIS/settingsMSensor.csv'
+pathMoisture = '/home/hoobs/.HIS/settingsMoisture.csv'
+pathUS = '/home/hoobs/.HIS/settingsUS.csv'
+pathSensor = '/home/hoobs/.HIS/settingsMSensor.csv'
 
 
 alarmTankEmpty = False
