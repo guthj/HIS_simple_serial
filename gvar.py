@@ -27,7 +27,7 @@ debuglevel = 5
 # 4 debug
 debugStr = ["None  :  ","Error :  ","Notice:  ","Info  :  ","Debug :  "]
 
-runPumpSec = 20
+runPumpSec = 15
 
 enableAutomaticWatering = True
 
