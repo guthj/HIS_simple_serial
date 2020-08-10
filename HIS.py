@@ -69,9 +69,9 @@ def resetHomeBridgeButtons():
     client.publish("HIS/Plant/WaterTarget/getDecrease", "false")
     client.publish("HIS/Plant/WaterTarget/currentValue", gvar.targetMoisture)
     if gvar.enableAutomaticWatering:
-        client.publish("HIS/Plant/WaterTarget/currentValue", "true")
+        client.publish("HIS/enableAutomaticWatering/getOn", "true")
     else:
-        client.publish("HIS/Plant/WaterTarget/currentValue", "false")
+        client.publish("HIS/enableAutomaticWatering/getOn", "false")
     
 
 def on_message(client, userdata, msg):
