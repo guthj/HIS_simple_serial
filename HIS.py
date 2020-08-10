@@ -79,7 +79,7 @@ def on_message(client, userdata, msg):
     log(msg.topic+" "+str(msg.payload),4)
     #CHECK FOR PLANT SPECIFIC MESSAGES
     if msg.topic == "HIS/Plant/Pump/setOn":
-        if msg.payload == "true":
+        if msg.payload == 'true':
             client.publish("HIS/Plant/Pump/getOn", "true")
             log("Turned on water on Plant via MQTT",2)
             forceWaterPlant(gvar.runPumpSec)
@@ -98,11 +98,11 @@ def on_message(client, userdata, msg):
         writeNewTargetMoistures()
             
     if msg.topic == "HIS/enableAutomaticWatering/setOn":
-        if msg.payload == "true":
+        if msg.payload == 'true':
             client.publish("HIS/enableAutomaticWatering/getOn", "true")
             gvar.enableAutomaticWatering = True
             log("Tried turning on enableAutomaticWatering, new State: " + str (gvar.enableAutomaticWatering),2)
-        if msg.payload == "false":
+        if msg.payload == 'false':
             client.publish("HIS/enableAutomaticWatering/getOn", "false")
             gvar.enableAutomaticWatering = False
             log("tried turning off enableAutomaticWatering, new State: " + str (gvar.enableAutomaticWatering),2)
