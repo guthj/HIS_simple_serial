@@ -15,8 +15,8 @@ os.chdir(os.path.dirname(__file__))
 import gvar
 import HIS
 
-if not os.path.exists("/home/pi/.HIS"):
-    os.makedirs("/home/pi/.HIS")
+if not os.path.exists("/home/hoobs/.HIS"):
+    os.makedirs("/home/hoobs/.HIS")
 
 
 x = input("Set watersensor on water tank w/o water, then press enter. write >n< to skip measurements")
