@@ -75,16 +75,17 @@ def resetHomeBridgeButtons():
     
 
 def on_message(client, userdata, msg):
+    messageText = str(msg.payload, 'utf-8')
     print(msg.topic+" "+str(msg.payload))
-    log(msg.topic+" "+str(msg.payload),4)
+    log(msg.topic+" "+ messageText,4)
     #CHECK FOR PLANT SPECIFIC MESSAGES
     if msg.topic == "HIS/Plant/Pump/setOn":
-        if msg.payload == 'true':
+        if messageText == "true":
             client.publish("HIS/Plant/Pump/getOn", "true")
             log("Turned on water on Plant via MQTT",2)
             forceWaterPlant(gvar.runPumpSec)
             client.publish("HIS/Plant/Pump/getOn", "false")
-        if msg.payload == "false":
+        if messageText == "false":
             client.publish("HIS/Plant/Pump/getOn", "false")
             stopPump()
 
@@ -98,11 +99,11 @@ def on_message(client, userdata, msg):
         writeNewTargetMoistures()
             
     if msg.topic == "HIS/enableAutomaticWatering/setOn":
-        if msg.payload == 'true':
+        if messageText == "true":
             client.publish("HIS/enableAutomaticWatering/getOn", "true")
             gvar.enableAutomaticWatering = True
             log("Tried turning on enableAutomaticWatering, new State: " + str (gvar.enableAutomaticWatering),2)
-        if msg.payload == 'false':
+        if messageText == "false":
             client.publish("HIS/enableAutomaticWatering/getOn", "false")
             gvar.enableAutomaticWatering = False
             log("tried turning off enableAutomaticWatering, new State: " + str (gvar.enableAutomaticWatering),2)
