@@ -176,7 +176,7 @@ def checkAndWater():
             if sensorArray[1] >= 0:
                 sensorDataM.append(sensorArray[1])
                 sensorDataT.append(sensorArray[0])
-                log("HIS/Log", "S"+ str(serialArray[i]) + ": Temperature: " + str(sensorArray[0]) + ", Moisture: " + str(sensorArray[1]*100)+"%", 2)
+                log("S"+ str(serialArray[i]) + ": Temperature: " + str(sensorArray[0]) + ", Moisture: " + str(sensorArray[1]*100)+"%", 2)
 
     for i in sensorDataM:
             averageMoisture+=i/len(sensorDataM)
