@@ -72,6 +72,9 @@ def resetHomeBridgeButtons():
         client.publish("HIS/enableAutomaticWatering/getOn", "true")
     else:
         client.publish("HIS/enableAutomaticWatering/getOn", "false")
+        
+    client.publish("HIS/Plant/currentMoisture", gvar.currentmoisture)
+    client.publish("HIS/Reservoir/Percentage", gvar.currentTank)
     
 
 def on_message(client, userdata, msg):
@@ -92,11 +95,11 @@ def on_message(client, userdata, msg):
     if msg.topic == "HIS/Plant/WaterTarget/setIncrease":
         gvar.targetMoisture +=1
         client.publish("HIS/Plant/WaterTarget/currentValue", gvar.targetMoisture)
-        writeNewTargetMoistures()
+        #writeNewTargetMoistures()
     if msg.topic == "HIS/Plant/WaterTarget/setDecrease":
         gvar.targetMoisture -= 1
         client.publish("HIS/Plant/WaterTarget/currentValue", gvar.targetMoisture)
-        writeNewTargetMoistures()
+        #writeNewTargetMoistures()
             
     if msg.topic == "HIS/enableAutomaticWatering/setOn":
         if messageText == "true":
@@ -170,7 +173,7 @@ def checkAndWater():
     else:
         gvar.alarmTankEmpty = False
         
-    
+    gvar.currentTank = int(percTank)
 
     sensorDataT=[]
     averageMoisture=0
@@ -195,6 +198,8 @@ def checkAndWater():
 
     client.publish("HIS/Plant/currentMoisture", int(averageMoisture*100))
     client.publish("HIS/Plant/currentTemp", int(averageTemp))
+    
+    gvar.currentmoisture = int(averageMoisture*100)
     
     if averageMoisture*100 < gvar.targetMoisture:
         log("Watering needed!", 2)
@@ -332,7 +337,7 @@ if __name__ == "__main__":
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(checkAndWater, 'interval', minutes=11)
-    scheduler.add_job(resetHomeBridgeButtons, 'interval', minutes=5)
+    scheduler.add_job(resetHomeBridgeButtons, 'interval', minutes=2)
     scheduler.add_job(resetAlarmSuppression, 'cron', hour=18, minute=0, second=0)
 
     

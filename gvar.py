@@ -31,6 +31,10 @@ runPumpSec = 15
 
 enableAutomaticWatering = True
 
+currentmoisture = 0
+currentTank = 0
+
+
 pathMoisture = '/home/hoobs/.HIS/settingsMoisture.csv'
 pathUS = '/home/hoobs/.HIS/settingsUS.csv'
 pathSensor = '/home/hoobs/.HIS/settingsMSensor.csv'
