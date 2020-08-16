@@ -44,3 +44,6 @@ alarmTankEmpty = False
 alarmTankEmptyDidAlarm = False
 alarmMoistureLow = False
 alarmMoistureLowDidAlarm = False
+
+runnerTimeSinceCheck = 0
+timeUntilRefresh = 3

@@ -65,6 +65,9 @@ def on_connect(client, userdata, flags, rc):
 
 
 def resetHomeBridgeButtons():
+    gvar.runnerTimeSinceCheck += gvar.timeUntilRefresh
+    log("Refeshing Homekit",3)
+    log("Time since last CheckAndWater: "+str(gvar.runnerTimeSinceCheck)+ " min",3)
     client.publish("HIS/Plant/WaterTarget/getIncrease", "false")
     client.publish("HIS/Plant/WaterTarget/getDecrease", "false")
     client.publish("HIS/Plant/WaterTarget/currentValue", gvar.targetMoisture)
@@ -158,8 +161,9 @@ def readMoistureSerial(devNum):
         return [-2,-2]
 
 
-def checkAndWater():
-    #fist check if water in tank:
+def getWaterPerc():
+     #fist check if water in tank:
+    log("Getting Waterlevel now",3)
     percTank = getPercFullTank()
     log("Tank " + str(percTank) + "% full",2)
     if percTank >100:
@@ -174,6 +178,10 @@ def checkAndWater():
         gvar.alarmTankEmpty = False
         
     gvar.currentTank = int(percTank)
+
+def checkAndWater():
+    log("Starting CheckAndWater",3)
+   
 
     sensorDataT=[]
     averageMoisture=0
@@ -200,6 +208,8 @@ def checkAndWater():
     client.publish("HIS/Plant/currentTemp", int(averageTemp))
     
     gvar.currentmoisture = int(averageMoisture*100)
+    
+    gvar.runnerTimeSinceCheck = 0
     
     if averageMoisture*100 < gvar.targetMoisture:
         log("Watering needed!", 2)
@@ -337,8 +347,9 @@ if __name__ == "__main__":
     scheduler = BackgroundScheduler()
     scheduler.start()
     scheduler.add_job(checkAndWater, 'interval', minutes=11)
-    scheduler.add_job(resetHomeBridgeButtons, 'interval', minutes=2)
+    scheduler.add_job(resetHomeBridgeButtons, 'interval', minutes=gvar.timeUntilRefresh)
     scheduler.add_job(resetAlarmSuppression, 'cron', hour=18, minute=0, second=0)
+    scheduler.add_job(getWaterPerc, 'interval', minutes=30)
 
     
     try: 
